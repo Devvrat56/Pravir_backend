@@ -5,7 +5,7 @@ from chatbot import Chatbot
 import os
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Hair Cider API")
+app = FastAPI(title="Prarvi AI  API")
 
 # Enable CORS for frontend development
 app.add_middleware(
