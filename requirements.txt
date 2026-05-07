@@ -1,0 +1,10 @@
+beautifulsoup4
+pandas
+faiss-cpu
+sentence-transformers
+streamlit
+groq
+python-dotenv
+fastapi
+uvicorn
+pydantic
