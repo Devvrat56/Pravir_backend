@@ -3,10 +3,5 @@ __pycache__/
 *.pyc
 .streamlit/
 scraped_data/
-data/products.csv
-data/chatbot_training_data.json
-data/cleaned_text.csv
-product.json
-knowledge_base.json
 backend.log
 venv/

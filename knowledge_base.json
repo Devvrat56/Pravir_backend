@@ -1,0 +1,56 @@
+[
+  {
+    "category": "service",
+    "name": "Classic Haircut",
+    "description": "A precision haircut tailored to your face shape and style preferences. Includes consultation, wash, and style.",
+    "price": "$50"
+  },
+  {
+    "category": "service",
+    "name": "Luxury Blowout",
+    "description": "Transform your hair with our signature blowout. Includes deep conditioning treatment and professional styling for maximum volume and shine.",
+    "price": "$45"
+  },
+  {
+    "category": "service",
+    "name": "Full Balayage",
+    "description": "Hand-painted highlights for a natural, sun-kissed look. Includes toner and bond-building treatment.",
+    "price": "$180+"
+  },
+  {
+    "category": "service",
+    "name": "Keratin Treatment",
+    "description": "Smoothing treatment that eliminates frizz and reduces styling time for up to 4 months.",
+    "price": "$250"
+  },
+  {
+    "category": "product",
+    "name": "Silk Shine Serum",
+    "description": "Lightweight oil that adds brilliant shine and heat protection. Best for all hair types.",
+    "price": "$28"
+  },
+  {
+    "category": "product",
+    "name": "Volumizing Mousse",
+    "description": "Professional-grade mousse for long-lasting lift and body without the crunch.",
+    "price": "$22"
+  },
+  {
+    "category": "policy",
+    "name": "Cancellation Policy",
+    "description": "Please provide at least 24 hours notice for cancellations. Late cancellations or no-shows may incur a 50% service fee.",
+    "price": "N/A"
+  },
+  {
+    "category": "policy",
+    "name": "Return Policy",
+    "description": "Unopened products can be returned within 14 days for a full refund. Opened products may be exchanged for salon credit within 7 days.",
+    "price": "N/A"
+  },
+  {
+    "category": "contact",
+    "name": "Customer Care Support",
+    "description": "For any issues, complaints, or human assistance, please contact our support team. Phone: +1-800-HAIRCIDER, Email: care@haircider.com. Hours: 9 AM - 6 PM.",
+    "price": "Free"
+  }
+]
