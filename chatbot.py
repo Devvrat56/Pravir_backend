@@ -114,7 +114,13 @@ class Chatbot:
             "lead_captured": False
         }
 
-    def process_query(self, query):
+    def process_query(self, query, provided_state=None):
+        # Update internal state with provided state if exists
+        if provided_state:
+            for key, value in provided_state.items():
+                if value is not None:
+                    self.user_state[key] = value
+
         # 1. Detect Intent
         intent = self.classifier.classify(query)
         
@@ -147,7 +153,7 @@ class Chatbot:
                     messages=[
                         {
                             "role": "system",
-                            "content": "You are a professional AI customer care assistant for Hair Cider. Follow the instructions and brand personality provided in the context strictly. Output text only."
+                            "content": "You are a professional AI customer care assistant for Prarvi. Follow the instructions and brand personality provided in the context strictly. Output text only."
                         },
                         {
                             "role": "user",
@@ -159,11 +165,11 @@ class Chatbot:
                     max_tokens=MAX_TOKENS,
                 )
                 response_text = chat_completion.choices[0].message.content
-                return response_text, retrieved_docs
+                return response_text, retrieved_docs, self.user_state
             except Exception as e:
-                return f"Error calling Groq API: {str(e)}", retrieved_docs
+                return f"Error calling Groq API: {str(e)}", retrieved_docs, self.user_state
         
-        return f"Mock response for: {query} (Groq API Key not configured)", retrieved_docs
+        return f"Mock response for: {query} (Groq API Key not configured)", retrieved_docs, self.user_state
 
 if __name__ == "__main__":
     bot = Chatbot("knowledge_base.json")

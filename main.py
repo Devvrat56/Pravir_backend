@@ -23,10 +23,12 @@ chatbot = Chatbot("knowledge_base.json")
 class ChatRequest(BaseModel):
     message: str
     api_key: Optional[str] = None
+    user_state: Optional[dict] = None
 
 class ChatResponse(BaseModel):
     response: str
     context: List[dict]
+    user_state: dict
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
@@ -39,8 +41,8 @@ async def chat_endpoint(request: ChatRequest):
         chatbot.client = Groq(api_key=request.api_key)
 
     try:
-        response_text, context = chatbot.process_query(request.message)
-        return ChatResponse(response=response_text, context=context)
+        response_text, context, updated_state = chatbot.process_query(request.message, provided_state=request.user_state)
+        return ChatResponse(response=response_text, context=context, user_state=updated_state)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
