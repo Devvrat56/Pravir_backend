@@ -1,14 +1,14 @@
-import faiss
 import numpy as np
 import os
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from utlis import load_json
-from config import TOP_K, EMBEDDING_MODEL, KNOWLEDGE_BASE_FILE
+from config import TOP_K, KNOWLEDGE_BASE_FILE
 
 class RAGEngine:
     def __init__(self):
-        print(f"Initializing RAG Engine with model: {EMBEDDING_MODEL}...")
-        self.model = SentenceTransformer(EMBEDDING_MODEL)
+        print("Initializing Lightweight RAG Engine with TF-IDF...")
+        self.vectorizer = TfidfVectorizer(stop_words='english')
         self.base_dir = os.path.dirname(os.path.abspath(__file__))
         
         # Load KB
@@ -24,70 +24,58 @@ class RAGEngine:
             self.products = []
             print("Warning: product.json not found.")
 
-        self.index = None
+        self.tfidf_matrix = None
         self.documents = []
         self._build_index()
 
     def _prepare_text(self, item):
-        """Combine fields into a single string for embedding."""
+        """Combine fields into a single string for indexing."""
         if 'title' in item: # Product structure
             name = item.get('title', 'Unknown')
             category = item.get('product_type', 'Hair')
             tags = ", ".join(item.get('tags', []))
-            
-            # Extract detailed variant info for automation
             variants = item.get('variants', [])
             prices = [str(v.get('price')) for v in variants if v.get('price')]
             price_range = f"${min(prices)} - ${max(prices)}" if prices else "N/A"
-            
-            # Stock check
-            in_stock = any(v.get('available', False) for v in variants)
-            stock_status = "In Stock" if in_stock else "Out of Stock"
-            
-            # Shipping data (average weight)
-            weights = [v.get('weight_grams', 0) for v in variants if v.get('weight_grams')]
-            avg_weight = f"{sum(weights)/len(weights):.1f}g" if weights else "100g"
-            
-            text = f"Product: {name}. Category: {category}. Tags: {tags}. Price Range: {price_range}. Stock Status: {stock_status}. Weight: {avg_weight}."
+            text = f"Product: {name}. Category: {category}. Tags: {tags}. Price Range: {price_range}."
         else: # Knowledge base structure
             name = item.get('name', 'Unknown')
             category = item.get('category', item.get('type', 'General'))
             description = item.get('description', '')
             price = item.get('price', 'N/A')
             text = f"Name: {name}. Category: {category}. Description: {description}. Price: {price}."
-            
             if 'metadata' in item and 'Content' in item['metadata']:
                 text += f" Content: {item['metadata']['Content']}."
-        
         return text
 
     def _build_index(self):
-        print("Building FAISS index...")
-        # Combine both data sources
+        print("Building TF-IDF index...")
         all_items = self.kb + self.products
         self.documents = [self._prepare_text(item) for item in all_items]
         
-        embeddings = self.model.encode(self.documents, show_progress_bar=True)
-        embeddings = np.array(embeddings).astype('float32')
-        
-        dimension = embeddings.shape[1]
-        self.index = faiss.IndexFlatL2(dimension)
-        self.index.add(embeddings)
-        print(f"Index built with {len(all_items)} total items.")
-        
-        # Store combined KB for retrieval lookup
+        # Build TF-IDF matrix
+        self.tfidf_matrix = self.vectorizer.fit_transform(self.documents)
         self.full_kb = all_items
+        print(f"Index built with {len(all_items)} total items.")
 
     def retrieve(self, query, k=TOP_K):
-        query_embedding = self.model.encode([query])
-        query_embedding = np.array(query_embedding).astype('float32')
+        # Transform query and calculate cosine similarity
+        query_vec = self.vectorizer.transform([query])
+        similarities = cosine_similarity(query_vec, self.tfidf_matrix).flatten()
         
-        distances, indices = self.index.search(query_embedding, k)
+        # Get top k indices
+        top_indices = similarities.argsort()[-k:][::-1]
         
         results = []
-        for i in indices[0]:
-            if i != -1:
+        for i in top_indices:
+            # Only include if there is some similarity
+            if similarities[i] > 0:
                 results.append(self.full_kb[i])
+        
+        # If no results found with TF-IDF, return first k as fallback
+        if not results:
+            results = self.full_kb[:k]
+            
         return results
 
 # Singleton instance

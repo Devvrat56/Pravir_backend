@@ -1,7 +1,6 @@
 # config.py
 
 TOP_K = 5
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 KNOWLEDGE_BASE_FILE = "knowledge_base.json"
 
 # Groq Settings

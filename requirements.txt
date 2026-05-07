@@ -1,7 +1,6 @@
 beautifulsoup4
 pandas
-faiss-cpu
-sentence-transformers
+scikit-learn
 streamlit
 groq
 python-dotenv
